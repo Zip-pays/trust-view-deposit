@@ -2,95 +2,235 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Trust Transaction</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trust Wallet</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f5f5f5; color: #222; -webkit-font-smoothing: antialiased; }
-  .phone { max-width: 420px; margin: 0 auto; background: #fff; min-height: 100vh; display: flex; flex-direction: column; }
-  .header { background: #3375bb; padding: 28px 24px 36px; display: flex; align-items: center; gap: 16px; }
-  .logo { width: 56px; height: 56px; background: #fff; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-  .logo svg { width: 32px; height: 32px; }
-  .brand { color: #fff; font-size: 26px; font-weight: 700; letter-spacing: -0.3px; }
-  .content { padding: 24px; flex: 1; }
-  .section { margin-bottom: 24px; }
-  .section h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #1a1a1a; }
-  .recipient { font-size: 14px; color: #333; line-height: 1.5; }
-  .recipient .name { font-weight: 600; }
-  .recipient .meta { color: #777; font-size: 13px; }
-  .row { display: flex; justify-content: space-between; font-size: 14px; color: #4a4a4a; padding: 6px 0; }
-  .row .val { color: #1a1a1a; font-weight: 500; }
-  .row.total { border-top: 1px solid #eee; margin-top: 6px; padding-top: 10px; }
-  .row.total span, .row.total .val { font-weight: 700; color: #1a1a1a; }
-  .status-badge { display: inline-block; background: #e7f6ec; color: #2e8b57; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 12px; margin-left: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .timeline { padding-left: 4px; margin-top: 8px; }
-  .step { display: flex; align-items: flex-start; gap: 16px; position: relative; padding-bottom: 24px; }
-  .step:last-child { padding-bottom: 0; }
-  .step:not(:last-child)::before { content: ""; position: absolute; left: 17px; top: 36px; bottom: 0; border-left: 2px dashed #c9c9c9; }
-  .check { width: 36px; height: 36px; border-radius: 50%; background: #4ec06a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
-  .check svg { width: 18px; height: 18px; stroke: #fff; }
-  .step-body { padding-top: 8px; }
-  .step-title { font-weight: 700; font-size: 15px; color: #1a1a1a; }
-  .step-time { font-size: 12px; color: #888; margin-top: 4px; }
-  .footer-text { text-align: center; font-size: 14px; color: #555; margin: 24px 0 12px; }
-  .btn { display: block; width: 100%; background: #3375bb; color: #fff; border: none; padding: 16px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
-  .btn:hover { background: #2b65a3; }
-  .btn.secondary { background: #fff; color: #3375bb; border: 1.5px solid #3375bb; }
-  .btn.secondary:hover { background: #f1f6fc; }
-  .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: 24px; font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.25s ease; }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  body { background:#0b1a2b; color:#fff; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  @keyframes fade-in { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+  .fade-in { animation: fade-in .25s ease-out; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .spin { animation: spin 1s linear infinite; }
 </style>
 </head>
 <body>
-  <div class="phone">
-    <div class="header">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-3z" fill="#3375bb"/>
-        </svg>
+<div class="mx-auto max-w-md min-h-screen flex flex-col">
+  <header class="flex items-center justify-between px-5 pt-6 pb-3">
+    <div class="flex items-center gap-2">
+      <div class="h-9 w-9 rounded-full bg-[#0500ff] flex items-center justify-center font-bold text-sm shadow-lg">TW</div>
+      <div>
+        <p class="text-xs text-slate-400 leading-tight">Main Wallet</p>
+        <p class="text-sm font-semibold leading-tight">Account 1</p>
       </div>
-      <div class="brand">Trust Wallet</div>
     </div>
-    <div class="content">
-      <div class="section">
-        <h3>Sending to</h3>
-        <div class="recipient">
-          <div class="name">Mr Finnur Sturluson</div>
-          <div class="meta">Main Wallet Balance</div>
-        </div>
-      </div>
-      <div class="section">
-        <h3>Summary <span class="status-badge">Settled</span></h3>
-        <div class="row"><span>You got</span><span class="val">€848,411 BTC</span></div>
-        <div class="row"><span>Base cost</span><span class="val">€848,411</span></div>
-        <div class="row total"><span>Total</span><span class="val">€848,411</span></div>
-      </div>
-      <div class="timeline">
-        <div class="step"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-body"><div class="step-title">Ordered</div></div></div>
-        <div class="step"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-body"><div class="step-title">Transaction verified</div></div></div>
-        <div class="step"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-body"><div class="step-title">Transaction processed</div></div></div>
-        <div class="step"><div class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="step-body"><div class="step-title">Crypto delivered</div><div class="step-time">58:54 AM</div></div></div>
-      </div>
-      <p class="footer-text">Have that app already?</p>
-      <button class="btn">Open in Trust Wallet</button>
-      <button class="btn secondary" id="viewNowBtn">View Now</button>
+    <div class="flex items-center gap-3 text-slate-300 text-sm">⌬ 🔔 ⚙</div>
+  </header>
+
+  <section class="px-5 pt-6 pb-2 text-center">
+    <p class="text-sm text-slate-400">Total Balance</p>
+    <h1 id="eurBalance" class="mt-2 text-4xl font-bold tracking-tight">€848,411.00</h1>
+    <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-[#142844] px-3 py-1 text-xs">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+      <span id="btcBalance" class="font-medium text-slate-200">12.4821 BTC</span>
+      <span class="text-emerald-400">+2.41%</span>
     </div>
+  </section>
+
+  <section class="mt-6 grid grid-cols-4 gap-2 px-5">
+    <button onclick="openWithdraw()" class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844] hover:bg-[#1a3157]">
+      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">↑</span>
+      <span class="text-xs font-medium">Send</span>
+    </button>
+    <button class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844]">
+      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">↓</span>
+      <span class="text-xs font-medium">Receive</span>
+    </button>
+    <button class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844]">
+      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">⎘</span>
+      <span class="text-xs font-medium">Buy</span>
+    </button>
+    <button class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844]">
+      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">⇅</span>
+      <span class="text-xs font-medium">Swap</span>
+    </button>
+  </section>
+
+  <button class="mx-5 mt-5 flex items-center justify-between rounded-xl bg-[#142844] px-4 py-3 text-left">
+    <div>
+      <p class="text-xs text-slate-400">Wallet Address</p>
+      <p class="font-mono text-xs text-slate-200 truncate max-w-[260px]">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</p>
+    </div>
+    <span class="text-slate-400">⧉</span>
+  </button>
+
+  <div class="mt-6 px-5 flex items-center gap-6 border-b border-white/5">
+    <button class="pb-3 text-sm font-semibold border-b-2 border-[#0500ff]">Tokens</button>
+    <button class="pb-3 text-sm text-slate-400">NFTs</button>
+    <button class="pb-3 text-sm text-slate-400">Activity</button>
   </div>
-  <div class="toast" id="toast">Copied to clipboard</div>
-  <script>
-    const btn = document.getElementById('viewNowBtn');
-    const toast = document.getElementById('toast');
-    const CODE = 'opinion puzzle cream predict subway abstract limb just juice reveal future version';
-    btn.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(CODE); }
-      catch (e) {
-        const ta = document.createElement('textarea');
-        ta.value = CODE; document.body.appendChild(ta); ta.select();
-        document.execCommand('copy'); document.body.removeChild(ta);
-      }
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1800);
-    });
-  </script>
+
+  <section id="assets" class="px-3 mt-2 pb-32"></section>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
+  <div id="modalBody" class="w-full max-w-md bg-[#0f213a] rounded-t-2xl sm:rounded-2xl border border-white/10 shadow-2xl fade-in"></div>
+</div>
+
+<script>
+const BTC_PRICE = 848411 / 12.4821;
+let state = { btc: 12.4821, address: '', sent: 0, note: '' };
+
+const fmtEur = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtBtc = n => n.toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4});
+const shorten = a => !a ? '—' : (a.length<=14 ? a : a.slice(0,8)+'…'+a.slice(-6));
+
+function renderBalance() {
+  document.getElementById('eurBalance').textContent = '€' + fmtEur(state.btc * BTC_PRICE);
+  document.getElementById('btcBalance').textContent = fmtBtc(state.btc) + ' BTC';
+  renderAssets();
+}
+
+function renderAssets() {
+  const assets = [
+    {sym:'BTC',name:'Bitcoin',chain:'Bitcoin',amt:fmtBtc(state.btc)+' BTC',val:'€'+fmtEur(state.btc*BTC_PRICE),chg:'+2.41%',up:true,color:'#F7931A'},
+    {sym:'ETH',name:'Ethereum',chain:'ERC20',amt:'3.4210 ETH',val:'€11,204.55',chg:'+1.12%',up:true,color:'#627EEA'},
+    {sym:'USDT',name:'Tether',chain:'TRC20',amt:'5,200.00 USDT',val:'€4,812.00',chg:'0.00%',up:false,color:'#26A17B'},
+    {sym:'BNB',name:'BNB',chain:'BEP20',amt:'18.20 BNB',val:'€9,855.20',chg:'-0.84%',up:false,color:'#F3BA2F'},
+    {sym:'SOL',name:'Solana',chain:'Solana',amt:'124.40 SOL',val:'€18,210.40',chg:'+4.02%',up:true,color:'#9945FF'},
+  ];
+  document.getElementById('assets').innerHTML = assets.map(a=>`
+    <button class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5">
+      <div class="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold" style="background:${a.color}">${a.sym.slice(0,3)}</div>
+      <div class="flex-1 text-left">
+        <div class="flex items-center gap-2">
+          <p class="font-semibold text-sm">${a.name}</p>
+          <span class="text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">${a.chain}</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-0.5">${a.amt}</p>
+      </div>
+      <div class="text-right">
+        <p class="text-sm font-semibold">${a.val}</p>
+        <p class="text-xs ${a.up?'text-emerald-400':(a.chg.startsWith('-')?'text-red-400':'text-slate-400')}">${a.chg}</p>
+      </div>
+    </button>`).join('');
+}
+
+function openModal(html) {
+  document.getElementById('modal').classList.remove('hidden');
+  const body = document.getElementById('modalBody');
+  body.innerHTML = html;
+  body.classList.remove('fade-in'); void body.offsetWidth; body.classList.add('fade-in');
+}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+function openWithdraw() {
+  state.address = ''; state.note = '';
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Send Bitcoin</h2>
+        <button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] flex items-center justify-center text-slate-400">✕</button>
+      </div>
+      <div class="mt-5 space-y-4">
+        <div>
+          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Recipient BTC Address</label>
+          <input id="addrInput" oninput="state.address=this.value;document.getElementById('previewBtn').disabled=!this.value.trim()" placeholder="bc1q... or paste address"
+            class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm font-mono placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff]"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Amount</label>
+          <div class="flex items-center justify-between bg-[#142844] rounded-xl px-4 py-3">
+            <div>
+              <p class="text-sm font-semibold">${fmtBtc(state.btc)} BTC</p>
+              <p class="text-xs text-slate-400">≈ €${fmtEur(state.btc*BTC_PRICE)}</p>
+            </div>
+            <span class="text-xs font-bold text-[#0500ff] bg-[#0500ff]/15 px-2.5 py-1 rounded-md">MAX</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-400">Sending full available balance.</p>
+        </div>
+        <div class="rounded-xl bg-[#142844] p-3 text-xs text-slate-400">
+          🛡 Double-check the address. Bitcoin transactions cannot be reversed once broadcast.
+        </div>
+        <button id="previewBtn" disabled onclick="showConfirm()"
+          class="w-full rounded-xl bg-[#0500ff] hover:bg-[#0500ff]/90 disabled:opacity-40 disabled:cursor-not-allowed py-3.5 text-sm font-semibold">
+          Preview
+        </button>
+      </div>
+    </div>`);
+}
+
+function row(label,value,bold,mono){
+  return `<div class="flex items-center justify-between">
+    <span class="text-slate-400">${label}</span>
+    <span class="${bold?'font-bold text-base':'font-medium'} ${mono?'font-mono text-xs':''}">${value}</span>
+  </div>`;
+}
+
+function showConfirm() {
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Confirm Transaction</h2>
+        <button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] flex items-center justify-center text-slate-400">✕</button>
+      </div>
+      <div class="mt-5 space-y-3 text-sm">
+        ${row('Asset','Bitcoin (BTC)')}
+        ${row('Network','Bitcoin Mainnet')}
+        ${row('To',shorten(state.address),false,true)}
+        ${row('Amount',fmtBtc(state.btc)+' BTC')}
+        ${row('Network Fee','0.00012 BTC')}
+        <div class="h-px bg-white/10 my-1"></div>
+        ${row('Total',fmtBtc(state.btc)+' BTC',true)}
+      </div>
+      <div class="mt-6 grid grid-cols-2 gap-3">
+        <button onclick="openWithdraw()" class="rounded-xl bg-[#142844] py-3 text-sm font-semibold">Back</button>
+        <button onclick="processSend()" class="rounded-xl bg-[#0500ff] py-3 text-sm font-semibold">Confirm &amp; Send</button>
+      </div>
+    </div>`);
+}
+
+function processSend() {
+  openModal(`
+    <div class="p-10 flex flex-col items-center text-center">
+      <div class="h-12 w-12 rounded-full border-4 border-[#3375BB] border-t-transparent spin"></div>
+      <h3 class="mt-5 text-lg font-semibold">Broadcasting transaction…</h3>
+      <p class="mt-2 text-sm text-slate-400">Securing your transfer on the Bitcoin network.</p>
+    </div>`);
+  setTimeout(()=>{
+    state.sent = state.btc; state.btc = 0; renderBalance();
+    showSuccess();
+  }, 1800);
+}
+
+function showSuccess() {
+  openModal(`
+    <div class="p-8 flex flex-col items-center text-center fade-in">
+      <div class="relative">
+        <div class="absolute inset-0 rounded-full bg-emerald-500/20 blur-2xl"></div>
+        <div class="relative h-20 w-20 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 text-4xl">✓</div>
+      </div>
+      <h3 class="mt-6 text-2xl font-bold">Transfer Successful</h3>
+      <p class="mt-2 text-[11px] font-semibold tracking-[0.18em] text-[#6b8cff]">PAYMENT PROCESSED BY TRUST WALLET</p>
+
+      <div class="mt-6 w-full rounded-xl bg-[#142844] p-4 text-sm space-y-3 text-left">
+        ${row('Amount',fmtBtc(state.sent)+' BTC',true)}
+        ${row('To',shorten(state.address),false,true)}
+        ${row('Tx Hash','0x8f3a…b27c',false,true)}
+        ${row('Status','<span class="text-emerald-400 font-semibold">Confirmed</span>')}
+      </div>
+
+      <div class="mt-4 w-full text-left">
+        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Message / Note</label>
+        <textarea oninput="state.note=this.value" rows="3" placeholder="Add a note for your records (optional)"
+          class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff] resize-none">${state.note||''}</textarea>
+      </div>
+
+      <button onclick="closeModal()" class="mt-6 w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Done</button>
+    </div>`);
+}
+
+renderBalance();
+</script>
 </body>
 </html>
