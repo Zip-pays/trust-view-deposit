@@ -1,239 +1,343 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Trust Wallet</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinnurTrade — Mercato Crypto</title>
 <style>
-  body { background:#0b1a2b; color:#fff; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  @keyframes fade-in { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
-  .fade-in { animation: fade-in .25s ease-out; }
-  @keyframes spin { to { transform: rotate(360deg) } }
-  .spin { animation: spin 1s linear infinite; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; font-family:'SF Pro Display','Segoe UI',system-ui,sans-serif; background:#05070d; color:#e9eef7; }
+  body {
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(0,146,70,0.10), transparent 60%),
+      radial-gradient(circle at 100% 100%, rgba(206,43,55,0.10), transparent 55%);
+    display:flex; justify-content:center; padding:24px 16px 60px;
+  }
+  .wrap { max-width:460px; width:100%; }
+  .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #18243d; }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .logo { width:38px; height:38px; border-radius:8px; background:linear-gradient(135deg,#009246 0%,#ffffff 50%,#ce2b37 100%); display:flex; align-items:center; justify-content:center; font-weight:800; color:#05070d; font-size:16px; }
+  .brand-title { font-size:15px; font-weight:800; letter-spacing:0.08em; }
+  .brand-sub { font-size:10px; text-transform:uppercase; letter-spacing:0.22em; opacity:0.55; }
+  .status { display:flex; align-items:center; gap:6px; font-size:10px; text-transform:uppercase; letter-spacing:0.15em; color:#5ee2a0; }
+  .dot { width:7px; height:7px; border-radius:50%; background:#5ee2a0; animation:pulse 1.8s infinite; box-shadow:0 0 10px #5ee2a0; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+  .balance-card { background:linear-gradient(135deg,#0a1224 0%,#13213f 100%); border:1px solid #1e2f52; border-radius:14px; padding:22px; margin-bottom:14px; position:relative; overflow:hidden; box-shadow:0 10px 40px rgba(0,146,70,0.08); }
+  .balance-label { font-size:10px; text-transform:uppercase; letter-spacing:0.28em; opacity:0.55; }
+  .balance-amt { font-size:34px; font-weight:800; margin-top:6px; letter-spacing:-0.02em; }
+  .balance-sub { font-size:12px; opacity:0.7; margin-top:4px; }
+  .badge-live { position:absolute; top:16px; right:16px; font-size:9px; text-transform:uppercase; letter-spacing:0.18em; background:rgba(94,226,160,0.12); color:#5ee2a0; border:1px solid rgba(94,226,160,0.3); padding:4px 10px; border-radius:20px; }
+
+  .market-card { background:#0a1224; border:1px solid #18243d; border-radius:14px; padding:16px; margin-bottom:14px; }
+  .market-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .pair { display:flex; align-items:center; gap:8px; }
+  .btc-icon { width:26px; height:26px; border-radius:50%; background:#f7931a; color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; }
+  .pair-name { font-size:14px; font-weight:700; }
+  .pair-sub { font-size:10px; opacity:0.5; }
+  .price-up { text-align:right; }
+  .price { font-size:16px; font-weight:700; color:#e9eef7; }
+  .change { font-size:11px; color:#5ee2a0; font-weight:600; }
+
+  .chart-wrap { position:relative; height:180px; background:linear-gradient(180deg, rgba(94,226,160,0.03) 0%, transparent 100%); border-radius:8px; overflow:hidden; }
+  .chart-wrap svg { width:100%; height:100%; display:block; }
+  .grid-line { stroke:#18243d; stroke-width:0.5; stroke-dasharray:2 3; }
+  .candle-up { fill:#5ee2a0; stroke:#5ee2a0; }
+  .candle-down { fill:#ff6b6b; stroke:#ff6b6b; }
+  .wick { stroke-width:1.2; }
+  .mining-label { position:absolute; top:8px; left:10px; font-size:9px; text-transform:uppercase; letter-spacing:0.22em; color:#5ee2a0; display:flex; align-items:center; gap:5px; }
+  .mining-label::before { content:''; width:6px; height:6px; border-radius:50%; background:#5ee2a0; animation:pulse 1.4s infinite; }
+
+  .chart-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px; }
+  .cstat { background:#04091a; border:1px solid #18243d; border-radius:8px; padding:10px; text-align:center; }
+  .cstat-l { font-size:9px; letter-spacing:0.2em; text-transform:uppercase; opacity:0.55; }
+  .cstat-v { font-size:13px; font-weight:700; margin-top:3px; }
+  .cstat-v.ok { color:#5ee2a0; }
+
+  .trade-card { background:linear-gradient(135deg,#062419 0%,#0a1224 100%); border:1px solid #1f6f4a; border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 0 32px rgba(94,226,160,0.08); }
+  .trade-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .trade-title { font-size:12px; text-transform:uppercase; letter-spacing:0.22em; color:#5ee2a0; }
+  .trade-badge { font-size:9px; text-transform:uppercase; letter-spacing:0.15em; background:rgba(94,226,160,0.15); color:#5ee2a0; padding:4px 8px; border-radius:20px; border:1px solid rgba(94,226,160,0.3); }
+  .signal-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .signal-label { font-size:11px; opacity:0.7; }
+  .signal-val { font-size:13px; font-weight:600; }
+  .profit-amt { font-size:32px; font-weight:800; color:#5ee2a0; margin:10px 0 4px; letter-spacing:-0.02em; }
+  .profit-sub { font-size:11px; opacity:0.65; margin-bottom:14px; }
+
+  .btn { width:100%; border:none; border-radius:10px; padding:14px; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+  .btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
+  .btn:disabled { cursor:not-allowed; transform:none; }
+  .btn-close { background:linear-gradient(135deg,#5ee2a0,#1f6f4a); color:#05070d; box-shadow:0 8px 24px rgba(94,226,160,0.25); }
+  .btn-withdraw { background:linear-gradient(135deg,#009246,#00703a); color:#fff; box-shadow:0 8px 24px rgba(0,146,70,0.3); margin-bottom:10px; }
+  .btn-secondary { background:#18243d; color:#cfe3ff; border:1px solid #2a3a5e; }
+  .btn-danger { background:linear-gradient(135deg,#ce2b37,#8b1a22); color:#fff; box-shadow:0 8px 24px rgba(206,43,55,0.3); }
+  .btn-ghost { background:transparent; color:#7a8aa8; }
+
+  .actions { display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:14px; }
+  .info { background:#0a1224; border:1px solid #18243d; border-radius:12px; padding:14px; font-size:11px; opacity:0.75; line-height:1.6; }
+  .footer { text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:0.25em; opacity:0.35; margin-top:24px; }
+
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:20px; z-index:100; }
+  .modal-overlay.show { display:flex; }
+  .modal { background:#0a1224; border:1px solid #18243d; border-radius:16px; padding:24px; max-width:420px; width:100%; max-height:90vh; overflow-y:auto; }
+  .modal-title { font-size:16px; font-weight:700; margin-bottom:6px; }
+  .modal-sub { font-size:11px; opacity:0.6; text-transform:uppercase; letter-spacing:0.2em; margin-bottom:16px; }
+  .bank-block { background:#04091a; border:1px solid #18243d; border-radius:10px; padding:14px; margin-bottom:16px; }
+  .bank-row { margin-bottom:10px; }
+  .bank-row:last-child { margin-bottom:0; }
+  .bank-l { font-size:10px; text-transform:uppercase; letter-spacing:0.18em; opacity:0.5; margin-bottom:3px; }
+  .bank-v { font-size:12px; font-weight:600; word-break:break-all; line-height:1.5; }
+  .bank-v.mono { font-family:'SF Mono',monospace; color:#f7c87a; }
+
+  .loader-wrap { text-align:center; padding:20px 0; }
+  .spinner { width:56px; height:56px; border:3px solid #18243d; border-top-color:#5ee2a0; border-radius:50%; animation:spin 0.9s linear infinite; margin:0 auto 16px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loader-text { font-size:13px; font-weight:600; margin-bottom:6px; }
+  .loader-sub { font-size:11px; opacity:0.6; }
+  .progress-bar { height:4px; background:#18243d; border-radius:2px; margin-top:16px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,#5ee2a0,#009246); width:0%; transition:width 1s linear; }
+
+  .error-icon { width:56px; height:56px; border-radius:50%; background:rgba(206,43,55,0.15); border:2px solid #ce2b37; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:26px; color:#ff6b6b; font-weight:700; }
+  .fee-box { background:linear-gradient(135deg,#1a0707,#2a0a0a); border:1px solid #6b1f1f; border-radius:10px; padding:16px; text-align:center; margin:14px 0; }
+  .fee-l { font-size:10px; text-transform:uppercase; letter-spacing:0.22em; opacity:0.7; color:#ff9a9a; }
+  .fee-a { font-size:32px; font-weight:800; color:#ff7a7a; margin-top:4px; }
+  .reassure { background:rgba(94,226,160,0.06); border:1px solid rgba(94,226,160,0.2); border-radius:10px; padding:14px; font-size:12px; line-height:1.6; margin:14px 0; }
+  .reassure b { color:#5ee2a0; }
+
+  .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-140px); background:linear-gradient(135deg,#009246,#00703a); color:#fff; padding:16px 20px; border-radius:12px; box-shadow:0 10px 40px rgba(0,146,70,0.4); z-index:200; transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); max-width:400px; width:calc(100% - 40px); }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  .toast-title { font-size:14px; font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+  .toast-body { font-size:12px; opacity:0.95; line-height:1.5; }
 </style>
 </head>
 <body>
-<div class="mx-auto max-w-md min-h-screen flex flex-col">
-  <header class="flex items-center justify-between px-5 pt-6 pb-3">
-    <div class="flex items-center gap-2">
-      <div class="h-9 w-9 rounded-full bg-[#0500ff] flex items-center justify-center font-bold text-sm shadow-lg">TW</div>
+<div class="wrap">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">₿</div>
       <div>
-        <p class="text-xs text-slate-400 leading-tight">Main Wallet</p>
-        <p class="text-sm font-semibold leading-tight">Account 1</p>
+        <div class="brand-title">BTC TRADE</div>
+        <div class="brand-sub">Trade Crypto · Live</div>
       </div>
     </div>
-    <div class="flex items-center gap-3 text-slate-300 text-sm">⌬ 🔔 ⚙</div>
-  </header>
-
-  <section class="px-5 pt-6 pb-2 text-center">
-    <p class="text-sm text-slate-400">Total Balance</p>
-    <h1 id="eurBalance" class="mt-2 text-4xl font-bold tracking-tight">€848,411.00</h1>
-    <div class="mt-2 inline-flex items-center gap-2 rounded-full bg-[#142844] px-3 py-1 text-xs">
-      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-      <span id="btcBalance" class="font-medium text-slate-200">12.4821 BTC</span>
-      <span class="text-emerald-400">+2.41%</span>
-    </div>
-  </section>
-
-  <section class="mt-6 grid grid-cols-4 gap-2 px-5">
-    <button onclick="openWithdraw()" class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844] hover:bg-[#1a3157]">
-      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">↑</span>
-      <span class="text-xs font-medium">Send</span>
-    </button>
-    <button class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844]">
-      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">↓</span>
-      <span class="text-xs font-medium">Receive</span>
-    </button>
-    <button class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844]">
-      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">⎘</span>
-      <span class="text-xs font-medium">Buy</span>
-    </button>
-    <button class="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#142844]">
-      <span class="h-9 w-9 rounded-full bg-[#0500ff]/15 text-[#6b8cff] flex items-center justify-center">⇅</span>
-      <span class="text-xs font-medium">Swap</span>
-    </button>
-  </section>
-
-  <button class="mx-5 mt-5 flex items-center justify-between rounded-xl bg-[#142844] px-4 py-3 text-left">
-    <div>
-      <p class="text-xs text-slate-400">ID</p>
-      <p class="font-mono text-xs text-slate-200 truncate max-w-[260px]">FINNUR STURLUSON</p>
-    </div>
-    <span class="text-slate-400">⧉</span>
-  </button>
-
-  <div class="mt-6 px-5 flex items-center gap-6 border-b border-white/5">
-    <button class="pb-3 text-sm font-semibold border-b-2 border-[#0500ff]">Tokens</button>
-    <button class="pb-3 text-sm text-slate-400">NFTs</button>
-    <button class="pb-3 text-sm text-slate-400">Activity</button>
+    <div class="status"><span class="dot"></span> Attivo</div>
   </div>
 
-  <section id="assets" class="px-3 mt-2 pb-32"></section>
+  <div class="balance-card">
+    <div class="badge-live">● Live</div>
+    <div class="balance-label">Saldo Portafoglio</div>
+    <div class="balance-amt">€12.480,00</div>
+    <div class="balance-sub">BTC · Conto Verificato 🇮🇹</div>
+  </div>
+
+  <div class="market-card">
+    <div class="market-head">
+      <div class="pair">
+        <div class="btc-icon">₿</div>
+        <div>
+          <div class="pair-name">BTC / EUR</div>
+          <div class="pair-sub">Bitcoin · Spot</div>
+        </div>
+      </div>
+      <div class="price-up">
+        <div class="price">€62.480</div>
+        <div class="change">▲ +2,84%</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="mining-label">Mining in corso</div>
+      <svg viewBox="0 0 400 180" preserveAspectRatio="none">
+        <line class="grid-line" x1="0" y1="45" x2="400" y2="45"/>
+        <line class="grid-line" x1="0" y1="90" x2="400" y2="90"/>
+        <line class="grid-line" x1="0" y1="135" x2="400" y2="135"/>
+        <line class="wick candle-up" x1="15" y1="70" x2="15" y2="130"/>
+        <rect class="candle-up" x="9" y="90" width="12" height="30"/>
+        <line class="wick candle-down" x1="35" y1="60" x2="35" y2="120"/>
+        <rect class="candle-down" x="29" y="75" width="12" height="28"/>
+        <line class="wick candle-up" x1="55" y1="80" x2="55" y2="140"/>
+        <rect class="candle-up" x="49" y="100" width="12" height="25"/>
+        <line class="wick candle-up" x1="75" y1="55" x2="75" y2="115"/>
+        <rect class="candle-up" x="69" y="70" width="12" height="35"/>
+        <line class="wick candle-down" x1="95" y1="50" x2="95" y2="110"/>
+        <rect class="candle-down" x="89" y="65" width="12" height="30"/>
+        <line class="wick candle-up" x1="115" y1="65" x2="115" y2="125"/>
+        <rect class="candle-up" x="109" y="85" width="12" height="28"/>
+        <line class="wick candle-up" x1="135" y1="45" x2="135" y2="105"/>
+        <rect class="candle-up" x="129" y="60" width="12" height="32"/>
+        <line class="wick candle-down" x1="155" y1="40" x2="155" y2="95"/>
+        <rect class="candle-down" x="149" y="55" width="12" height="25"/>
+        <line class="wick candle-up" x1="175" y1="55" x2="175" y2="115"/>
+        <rect class="candle-up" x="169" y="72" width="12" height="30"/>
+        <line class="wick candle-up" x1="195" y1="35" x2="195" y2="90"/>
+        <rect class="candle-up" x="189" y="48" width="12" height="30"/>
+        <line class="wick candle-down" x1="215" y1="30" x2="215" y2="85"/>
+        <rect class="candle-down" x="209" y="45" width="12" height="28"/>
+        <line class="wick candle-up" x1="235" y1="45" x2="235" y2="100"/>
+        <rect class="candle-up" x="229" y="62" width="12" height="28"/>
+        <line class="wick candle-up" x1="255" y1="25" x2="255" y2="80"/>
+        <rect class="candle-up" x="249" y="38" width="12" height="32"/>
+        <line class="wick candle-up" x1="275" y1="20" x2="275" y2="70"/>
+        <rect class="candle-up" x="269" y="30" width="12" height="30"/>
+        <line class="wick candle-down" x1="295" y1="18" x2="295" y2="65"/>
+        <rect class="candle-down" x="289" y="28" width="12" height="25"/>
+        <line class="wick candle-up" x1="315" y1="30" x2="315" y2="80"/>
+        <rect class="candle-up" x="309" y="42" width="12" height="30"/>
+        <line class="wick candle-up" x1="335" y1="15" x2="335" y2="65"/>
+        <rect class="candle-up" x="329" y="25" width="12" height="32"/>
+        <line class="wick candle-up" x1="355" y1="10" x2="355" y2="55"/>
+        <rect class="candle-up" x="349" y="18" width="12" height="30"/>
+        <line class="wick candle-up" x1="375" y1="8" x2="375" y2="50"/>
+        <rect class="candle-up" x="369" y="14" width="12" height="30"/>
+      </svg>
+    </div>
+
+    <div class="chart-stats">
+      <div class="cstat"><div class="cstat-l">Alto 24h</div><div class="cstat-v">€63.120</div></div>
+      <div class="cstat"><div class="cstat-l">Basso 24h</div><div class="cstat-v">€60.890</div></div>
+      <div class="cstat"><div class="cstat-l">Volume</div><div class="cstat-v ok">1.284 BTC</div></div>
+    </div>
+  </div>
+
+  <div class="trade-card">
+    <div class="trade-head">
+      <div class="trade-title">// Segnale Attivo</div>
+      <div class="trade-badge">● Profitto</div>
+    </div>
+    <div class="signal-row"><span class="signal-label">Coppia</span><span class="signal-val">BTC/EUR</span></div>
+    <div class="signal-row"><span class="signal-label">Posizione</span><span class="signal-val">LONG · x10</span></div>
+    <div class="signal-row"><span class="signal-label">Entrata</span><span class="signal-val">€60.720</span></div>
+    <div class="signal-row"><span class="signal-label">Chiusura</span><span class="signal-val">€62.480</span></div>
+    <div class="profit-amt">+€480,00</div>
+    <div class="profit-sub">Profitto Netto · Pronto per la Chiusura</div>
+    <button class="btn btn-close" id="closeTradeBtn">✓ Chiudi Operazione</button>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-withdraw" id="withdrawBtn">💶 Preleva Fondi</button>
+    <button class="btn btn-secondary">📊 Cronologia Operazioni</button>
+  </div>
+
+  <div class="info">
+    <b>Nota:</b> Le operazioni vengono eseguite tramite il nostro nodo EU-07 con latenza inferiore a 50ms. Tutti i fondi sono protetti da custodia assicurata.
+  </div>
+
+  <div class="footer">© 2025 Trade · EU-NODE-07 🇮🇹</div>
 </div>
 
-<!-- Modal -->
-<div id="modal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-  <div id="modalBody" class="w-full max-w-md bg-[#0f213a] rounded-t-2xl sm:rounded-2xl border border-white/10 shadow-2xl fade-in"></div>
+<div class="toast" id="toast">
+  <div class="toast-title">📣 Operazione Completata</div>
+  <div class="toast-body">La tua operazione è stata chiusa con successo. <b>Guadagno Totale: €480,00</b></div>
+</div>
+
+<div class="modal-overlay" id="withdrawModal">
+  <div class="modal">
+    <div class="modal-title">Conferma Prelievo</div>
+    <div class="modal-sub">Verifica i dati del conto</div>
+    <p style="font-size:12px; opacity:0.75; margin-bottom:14px; line-height:1.6;">Per i bonifici locali e internazionali, conferma che i seguenti dati bancari siano corretti:</p>
+    <div class="bank-block">
+      <div class="bank-row"><div class="bank-l">Beneficiario</div><div class="bank-v">Tullio Fantin</div></div>
+      <div class="bank-row"><div class="bank-l">IBAN</div><div class="bank-v mono">LT02 3250 0378 0833 4986</div></div>
+      <div class="bank-row"><div class="bank-l">Codice BIC/SWIFT</div><div class="bank-v mono">REVOLT21</div></div>
+      <div class="bank-row"><div class="bank-l">Nome e sede della banca</div><div class="bank-v">Revolut Bank UAB<br>Konstitucijos ave. 21B, 08130, Vilnius, Lithuania</div></div>
+      <div class="bank-row"><div class="bank-l">BIC banca corrispondente</div><div class="bank-v mono">CHASDEFX</div></div>
+    </div>
+    <button class="btn btn-withdraw" id="confirmWithdrawBtn" style="margin-bottom:8px;">✓ Conferma Prelievo</button>
+    <button class="btn btn-ghost" data-close="withdrawModal">Annulla</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="processingModal">
+  <div class="modal">
+    <div class="loader-wrap">
+      <div class="spinner"></div>
+      <div class="loader-text">Elaborazione Prelievo in Corso...</div>
+      <div class="loader-sub" id="processingSub">Connessione al nodo bancario EU-07</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="loader-sub" style="margin-top:12px;" id="processingCounter">0s / 44s</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="errorModal">
+  <div class="modal">
+    <div class="error-icon">✕</div>
+    <div class="modal-title" style="text-align:center;">Errore 404 · Prelievo</div>
+    <div class="modal-sub" style="text-align:center;">ERR_NETWORK_FEE_REQUIRED</div>
+    <p style="font-size:12px; opacity:0.8; line-height:1.6; margin-bottom:8px;">Il ponte custodiale ha bloccato il trasferimento. Per completare il prelievo verso il tuo conto Revolut è richiesta una <b>commissione di rete</b> una tantum.</p>
+    <div class="fee-box">
+      <div class="fee-l">Commissione di Rete Richiesta</div>
+      <div class="fee-a">€65,00</div>
+    </div>
+    <div class="reassure">
+      ✅ <b>Rassicurazione:</b> Una volta effettuato il pagamento della commissione di <b>€65,00</b>, contatta il nostro <b>supporto su Telegram</b>. Il prelievo di <b>€480,00</b> verrà immediatamente processato e accreditato sul tuo conto Revolut (IBAN LT02 3250 0378 0833 4986) entro pochi minuti.
+    </div>
+    <button class="btn btn-danger" id="telegramBtn" style="margin-bottom:8px;">📩 Contatta Supporto Telegram</button>
+    <button class="btn btn-ghost" data-close="errorModal">Chiudi</button>
+  </div>
 </div>
 
 <script>
-const BTC_PRICE = 848411 / 12.4821;
-let state = { btc: 12.4821, address: '', sent: 0, note: '' };
+  const $ = id => document.getElementById(id);
+  const openModal = id => $(id).classList.add('show');
+  const closeModal = id => $(id).classList.remove('show');
 
-const fmtEur = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtBtc = n => n.toLocaleString('en-US',{minimumFractionDigits:4,maximumFractionDigits:4});
-const shorten = a => !a ? '—' : (a.length<=14 ? a : a.slice(0,8)+'…'+a.slice(-6));
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close')));
+  });
 
-function renderBalance() {
-  document.getElementById('eurBalance').textContent = '€' + fmtEur(state.btc * BTC_PRICE);
-  document.getElementById('btcBalance').textContent = fmtBtc(state.btc) + ' BTC';
-  renderAssets();
-}
+  function showToast() {
+    const t = $('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 5500);
+  }
 
-function renderAssets() {
-  const assets = [
-    {sym:'BTC',name:'Bitcoin',chain:'Bitcoin',amt:fmtBtc(state.btc)+' BTC',val:'€'+fmtEur(state.btc*BTC_PRICE),chg:'+2.41%',up:true,color:'#F7931A'},
-    {sym:'ETH',name:'Ethereum',chain:'ERC20',amt:'3.4210 ETH',val:'€11,204.55',chg:'+1.12%',up:true,color:'#627EEA'},
-    {sym:'USDT',name:'Tether',chain:'TRC20',amt:'5,200.00 USDT',val:'€4,812.00',chg:'0.00%',up:false,color:'#26A17B'},
-    {sym:'BNB',name:'BNB',chain:'BEP20',amt:'18.20 BNB',val:'€9,855.20',chg:'-0.84%',up:false,color:'#F3BA2F'},
-    {sym:'SOL',name:'Solana',chain:'Solana',amt:'124.40 SOL',val:'€18,210.40',chg:'+4.02%',up:true,color:'#9945FF'},
-  ];
-  document.getElementById('assets').innerHTML = assets.map(a=>`
-    <button class="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5">
-      <div class="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold" style="background:${a.color}">${a.sym.slice(0,3)}</div>
-      <div class="flex-1 text-left">
-        <div class="flex items-center gap-2">
-          <p class="font-semibold text-sm">${a.name}</p>
-          <span class="text-[10px] text-slate-400 bg-white/5 px-1.5 py-0.5 rounded">${a.chain}</span>
-        </div>
-        <p class="text-xs text-slate-400 mt-0.5">${a.amt}</p>
-      </div>
-      <div class="text-right">
-        <p class="text-sm font-semibold">${a.val}</p>
-        <p class="text-xs ${a.up?'text-emerald-400':(a.chg.startsWith('-')?'text-red-400':'text-slate-400')}">${a.chg}</p>
-      </div>
-    </button>`).join('');
-}
+  $('closeTradeBtn').addEventListener('click', () => {
+    const btn = $('closeTradeBtn');
+    btn.disabled = true;
+    btn.textContent = 'Chiusura in corso...';
+    setTimeout(() => {
+      showToast();
+      btn.textContent = '✓ Operazione Chiusa';
+      btn.style.opacity = '0.6';
+    }, 1200);
+  });
 
-function openModal(html) {
-  document.getElementById('modal').classList.remove('hidden');
-  const body = document.getElementById('modalBody');
-  body.innerHTML = html;
-  body.classList.remove('fade-in'); void body.offsetWidth; body.classList.add('fade-in');
-}
-function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+  $('withdrawBtn').addEventListener('click', () => openModal('withdrawModal'));
 
-function openWithdraw() {
-  state.address = ''; state.note = '';
-  openModal(`
-    <div class="p-6">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold">Send Bitcoin</h2>
-        <button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] flex items-center justify-center text-slate-400">✕</button>
-      </div>
-      <div class="mt-5 space-y-4">
-        <div>
-          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Recipient BTC Address</label>
-          <input id="addrInput" oninput="state.address=this.value;document.getElementById('previewBtn').disabled=!this.value.trim()" placeholder="bc1q... or paste address"
-            class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm font-mono placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff]"/>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-400 mb-1.5 block">Amount</label>
-          <div class="flex items-center justify-between bg-[#142844] rounded-xl px-4 py-3">
-            <div>
-              <p class="text-sm font-semibold">${fmtBtc(state.btc)} BTC</p>
-              <p class="text-xs text-slate-400">≈ €${fmtEur(state.btc*BTC_PRICE)}</p>
-            </div>
-            <span class="text-xs font-bold text-[#0500ff] bg-[#0500ff]/15 px-2.5 py-1 rounded-md">MAX</span>
-          </div>
-          <p class="mt-1 text-xs text-slate-400">Sending full available balance.</p>
-        </div>
-        <div class="rounded-xl bg-[#142844] p-3 text-xs text-slate-400">
-          🛡 Double-check the address. Bitcoin transactions cannot be reversed once broadcast.
-        </div>
-        <button id="previewBtn" disabled onclick="showConfirm()"
-          class="w-full rounded-xl bg-[#0500ff] hover:bg-[#0500ff]/90 disabled:opacity-40 disabled:cursor-not-allowed py-3.5 text-sm font-semibold">
-          Preview
-        </button>
-      </div>
-    </div>`);
-}
+  $('confirmWithdrawBtn').addEventListener('click', () => {
+    closeModal('withdrawModal');
+    openModal('processingModal');
+    const fill = $('progressFill');
+    const counter = $('processingCounter');
+    const sub = $('processingSub');
+    const messages = [
+      'Connessione al nodo bancario EU-07',
+      'Verifica IBAN LT02 3250 0378 0833 4986',
+      'Autenticazione SWIFT REVOLT21',
+      'Trasmissione al ponte custodiale',
+      'Attesa conferma banca corrispondente Chase',
+      'Elaborazione finale del bonifico SEPA'
+    ];
+    let s = 0;
+    const total = 44;
+    fill.style.width = '0%';
+    const iv = setInterval(() => {
+      s++;
+      fill.style.width = (s / total * 100) + '%';
+      counter.textContent = s + 's / ' + total + 's';
+      sub.textContent = messages[Math.min(Math.floor(s / (total / messages.length)), messages.length - 1)];
+      if (s >= total) {
+        clearInterval(iv);
+        closeModal('processingModal');
+        openModal('errorModal');
+      }
+    }, 1000);
+  });
 
-function row(label,value,bold,mono){
-  return `<div class="flex items-center justify-between">
-    <span class="text-slate-400">${label}</span>
-    <span class="${bold?'font-bold text-base':'font-medium'} ${mono?'font-mono text-xs':''}">${value}</span>
-  </div>`;
-}
-
-function showConfirm() {
-  openModal(`
-    <div class="p-6">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold">Confirm Transaction</h2>
-        <button onclick="closeModal()" class="h-8 w-8 rounded-full bg-[#142844] flex items-center justify-center text-slate-400">✕</button>
-      </div>
-      <div class="mt-5 space-y-3 text-sm">
-        ${row('Asset','Bitcoin (BTC)')}
-        ${row('Network','Bitcoin Mainnet')}
-        ${row('To',shorten(state.address),false,true)}
-        ${row('Amount',fmtBtc(state.btc)+' BTC')}
-        ${row('Network Fee','0.00012 BTC')}
-        <div class="h-px bg-white/10 my-1"></div>
-        ${row('Total',fmtBtc(state.btc)+' BTC',true)}
-      </div>
-      <div class="mt-6 grid grid-cols-2 gap-3">
-        <button onclick="openWithdraw()" class="rounded-xl bg-[#142844] py-3 text-sm font-semibold">Back</button>
-        <button onclick="processSend()" class="rounded-xl bg-[#0500ff] py-3 text-sm font-semibold">Confirm &amp; Send</button>
-      </div>
-    </div>`);
-}
-
-function processSend() {
-  openModal(`
-    <div class="p-10 flex flex-col items-center text-center">
-      <div class="h-12 w-12 rounded-full border-4 border-[#3375BB] border-t-transparent spin"></div>
-      <h3 class="mt-5 text-lg font-semibold">Broadcasting transaction…</h3>
-      <p class="mt-2 text-sm text-slate-400">Securing your transfer on the Bitcoin network.</p>
-    </div>`);
-  setTimeout(()=>{
-    state.sent = state.btc; state.btc = 0; renderBalance();
-    showSuccess();
-  }, 1800);
-}
-
-function showSuccess() {
-  openModal(`
-    <div class="p-8 flex flex-col items-center text-center fade-in">
-      <div class="relative">
-        <div class="absolute inset-0 rounded-full bg-emerald-500/20 blur-2xl"></div>
-        <div class="relative h-20 w-20 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 text-4xl">✓</div>
-      </div>
-      <h3 class="mt-6 text-2xl font-bold">Transfer Successful</h3>
-      <p class="mt-2 text-[11px] font-semibold tracking-[0.18em] text-[#6b8cff]">PAYMENT PROCESSED BY TRUST WALLET</p>
-
-      <div class="mt-6 w-full rounded-xl bg-[#142844] p-4 text-sm space-y-3 text-left">
-        ${row('Amount',fmtBtc(state.sent)+' BTC',true)}
-        ${row('To',shorten(state.address),false,true)}
-        ${row('Tx Hash','0x8f3a…b27c',false,true)}
-        ${row('Status','<span class="text-emerald-400 font-semibold">Confirmed</span>')}
-      </div>
-
-      <div class="mt-4 w-full text-left">
-        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Message / Note</label>
-        <textarea oninput="state.note=this.value" rows="3" placeholder="Your withdrawal of €848,411 has been successful.
-To activate visibility and spending, a payment of €30 is required.
-
-If this payment is not completed, the funds will be reversed back to the originating account."
-          class="w-full bg-[#142844] rounded-xl px-4 py-3 text-sm placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-[#0500ff] resize-none">${state.note||''}</textarea>
-      </div>
-
-      <button onclick="closeModal()" class="mt-6 w-full rounded-xl bg-[#0500ff] py-3.5 text-sm font-semibold">Done</button>
-    </div>`);
-}
-
-renderBalance();
+  $('telegramBtn').addEventListener('click', () => {
+    window.open('https://t.me/', '_blank');
+  });
 </script>
 </body>
 </html>
