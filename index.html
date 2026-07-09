@@ -1,343 +1,332 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mercato Crypto</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { height:100%; font-family:'SF Pro Display','Segoe UI',system-ui,sans-serif; background:#05070d; color:#e9eef7; }
-  body {
-    background-image:
-      radial-gradient(circle at 20% 0%, rgba(0,146,70,0.10), transparent 60%),
-      radial-gradient(circle at 100% 100%, rgba(206,43,55,0.10), transparent 55%);
-    display:flex; justify-content:center; padding:24px 16px 60px;
-  }
-  .wrap { max-width:460px; width:100%; }
-  .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #18243d; }
-  .brand { display:flex; align-items:center; gap:10px; }
-  .logo { width:38px; height:38px; border-radius:8px; background:linear-gradient(135deg,#009246 0%,#ffffff 50%,#ce2b37 100%); display:flex; align-items:center; justify-content:center; font-weight:800; color:#05070d; font-size:16px; }
-  .brand-title { font-size:15px; font-weight:800; letter-spacing:0.08em; }
-  .brand-sub { font-size:10px; text-transform:uppercase; letter-spacing:0.22em; opacity:0.55; }
-  .status { display:flex; align-items:center; gap:6px; font-size:10px; text-transform:uppercase; letter-spacing:0.15em; color:#5ee2a0; }
-  .dot { width:7px; height:7px; border-radius:50%; background:#5ee2a0; animation:pulse 1.8s infinite; box-shadow:0 0 10px #5ee2a0; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-
-  .balance-card { background:linear-gradient(135deg,#0a1224 0%,#13213f 100%); border:1px solid #1e2f52; border-radius:14px; padding:22px; margin-bottom:14px; position:relative; overflow:hidden; box-shadow:0 10px 40px rgba(0,146,70,0.08); }
-  .balance-label { font-size:10px; text-transform:uppercase; letter-spacing:0.28em; opacity:0.55; }
-  .balance-amt { font-size:34px; font-weight:800; margin-top:6px; letter-spacing:-0.02em; }
-  .balance-sub { font-size:12px; opacity:0.7; margin-top:4px; }
-  .badge-live { position:absolute; top:16px; right:16px; font-size:9px; text-transform:uppercase; letter-spacing:0.18em; background:rgba(94,226,160,0.12); color:#5ee2a0; border:1px solid rgba(94,226,160,0.3); padding:4px 10px; border-radius:20px; }
-
-  .market-card { background:#0a1224; border:1px solid #18243d; border-radius:14px; padding:16px; margin-bottom:14px; }
-  .market-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-  .pair { display:flex; align-items:center; gap:8px; }
-  .btc-icon { width:26px; height:26px; border-radius:50%; background:#f7931a; color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; }
-  .pair-name { font-size:14px; font-weight:700; }
-  .pair-sub { font-size:10px; opacity:0.5; }
-  .price-up { text-align:right; }
-  .price { font-size:16px; font-weight:700; color:#e9eef7; }
-  .change { font-size:11px; color:#5ee2a0; font-weight:600; }
-
-  .chart-wrap { position:relative; height:180px; background:linear-gradient(180deg, rgba(94,226,160,0.03) 0%, transparent 100%); border-radius:8px; overflow:hidden; }
-  .chart-wrap svg { width:100%; height:100%; display:block; }
-  .grid-line { stroke:#18243d; stroke-width:0.5; stroke-dasharray:2 3; }
-  .candle-up { fill:#5ee2a0; stroke:#5ee2a0; }
-  .candle-down { fill:#ff6b6b; stroke:#ff6b6b; }
-  .wick { stroke-width:1.2; }
-  .mining-label { position:absolute; top:8px; left:10px; font-size:9px; text-transform:uppercase; letter-spacing:0.22em; color:#5ee2a0; display:flex; align-items:center; gap:5px; }
-  .mining-label::before { content:''; width:6px; height:6px; border-radius:50%; background:#5ee2a0; animation:pulse 1.4s infinite; }
-
-  .chart-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px; }
-  .cstat { background:#04091a; border:1px solid #18243d; border-radius:8px; padding:10px; text-align:center; }
-  .cstat-l { font-size:9px; letter-spacing:0.2em; text-transform:uppercase; opacity:0.55; }
-  .cstat-v { font-size:13px; font-weight:700; margin-top:3px; }
-  .cstat-v.ok { color:#5ee2a0; }
-
-  .trade-card { background:linear-gradient(135deg,#062419 0%,#0a1224 100%); border:1px solid #1f6f4a; border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 0 32px rgba(94,226,160,0.08); }
-  .trade-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .trade-title { font-size:12px; text-transform:uppercase; letter-spacing:0.22em; color:#5ee2a0; }
-  .trade-badge { font-size:9px; text-transform:uppercase; letter-spacing:0.15em; background:rgba(94,226,160,0.15); color:#5ee2a0; padding:4px 8px; border-radius:20px; border:1px solid rgba(94,226,160,0.3); }
-  .signal-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
-  .signal-label { font-size:11px; opacity:0.7; }
-  .signal-val { font-size:13px; font-weight:600; }
-  .profit-amt { font-size:32px; font-weight:800; color:#5ee2a0; margin:10px 0 4px; letter-spacing:-0.02em; }
-  .profit-sub { font-size:11px; opacity:0.65; margin-bottom:14px; }
-
-  .btn { width:100%; border:none; border-radius:10px; padding:14px; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.18em; cursor:pointer; transition:all 0.2s; font-family:inherit; }
-  .btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
-  .btn:disabled { cursor:not-allowed; transform:none; }
-  .btn-close { background:linear-gradient(135deg,#5ee2a0,#1f6f4a); color:#05070d; box-shadow:0 8px 24px rgba(94,226,160,0.25); }
-  .btn-withdraw { background:linear-gradient(135deg,#009246,#00703a); color:#fff; box-shadow:0 8px 24px rgba(0,146,70,0.3); margin-bottom:10px; }
-  .btn-secondary { background:#18243d; color:#cfe3ff; border:1px solid #2a3a5e; }
-  .btn-danger { background:linear-gradient(135deg,#ce2b37,#8b1a22); color:#fff; box-shadow:0 8px 24px rgba(206,43,55,0.3); }
-  .btn-ghost { background:transparent; color:#7a8aa8; }
-
-  .actions { display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:14px; }
-  .info { background:#0a1224; border:1px solid #18243d; border-radius:12px; padding:14px; font-size:11px; opacity:0.75; line-height:1.6; }
-  .footer { text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:0.25em; opacity:0.35; margin-top:24px; }
-
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:20px; z-index:100; }
-  .modal-overlay.show { display:flex; }
-  .modal { background:#0a1224; border:1px solid #18243d; border-radius:16px; padding:24px; max-width:420px; width:100%; max-height:90vh; overflow-y:auto; }
-  .modal-title { font-size:16px; font-weight:700; margin-bottom:6px; }
-  .modal-sub { font-size:11px; opacity:0.6; text-transform:uppercase; letter-spacing:0.2em; margin-bottom:16px; }
-  .bank-block { background:#04091a; border:1px solid #18243d; border-radius:10px; padding:14px; margin-bottom:16px; }
-  .bank-row { margin-bottom:10px; }
-  .bank-row:last-child { margin-bottom:0; }
-  .bank-l { font-size:10px; text-transform:uppercase; letter-spacing:0.18em; opacity:0.5; margin-bottom:3px; }
-  .bank-v { font-size:12px; font-weight:600; word-break:break-all; line-height:1.5; }
-  .bank-v.mono { font-family:'SF Mono',monospace; color:#f7c87a; }
-
-  .loader-wrap { text-align:center; padding:20px 0; }
-  .spinner { width:56px; height:56px; border:3px solid #18243d; border-top-color:#5ee2a0; border-radius:50%; animation:spin 0.9s linear infinite; margin:0 auto 16px; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .loader-text { font-size:13px; font-weight:600; margin-bottom:6px; }
-  .loader-sub { font-size:11px; opacity:0.6; }
-  .progress-bar { height:4px; background:#18243d; border-radius:2px; margin-top:16px; overflow:hidden; }
-  .progress-fill { height:100%; background:linear-gradient(90deg,#5ee2a0,#009246); width:0%; transition:width 1s linear; }
-
-  .error-icon { width:56px; height:56px; border-radius:50%; background:rgba(206,43,55,0.15); border:2px solid #ce2b37; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:26px; color:#ff6b6b; font-weight:700; }
-  .fee-box { background:linear-gradient(135deg,#1a0707,#2a0a0a); border:1px solid #6b1f1f; border-radius:10px; padding:16px; text-align:center; margin:14px 0; }
-  .fee-l { font-size:10px; text-transform:uppercase; letter-spacing:0.22em; opacity:0.7; color:#ff9a9a; }
-  .fee-a { font-size:32px; font-weight:800; color:#ff7a7a; margin-top:4px; }
-  .reassure { background:rgba(94,226,160,0.06); border:1px solid rgba(94,226,160,0.2); border-radius:10px; padding:14px; font-size:12px; line-height:1.6; margin:14px 0; }
-  .reassure b { color:#5ee2a0; }
-
-  .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-140px); background:linear-gradient(135deg,#009246,#00703a); color:#fff; padding:16px 20px; border-radius:12px; box-shadow:0 10px 40px rgba(0,146,70,0.4); z-index:200; transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); max-width:400px; width:calc(100% - 40px); }
-  .toast.show { transform:translateX(-50%) translateY(0); }
-  .toast-title { font-size:14px; font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
-  .toast-body { font-size:12px; opacity:0.95; line-height:1.5; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trust</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0b0f1a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(180deg, #0b1426 0%, #0b0f1a 100%);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #3375BB;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 22px;
+    }
+    .brand-title { font-weight: 600; font-size: 15px; }
+    .brand-sub { color: #9ca3af; font-size: 12px; }
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; margin-left: 8px;
+    }
+    .ring {
+      margin: 30px auto;
+      width: 280px; height: 280px;
+      border: 4px solid #3375BB;
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      box-shadow: 0 0 40px rgba(51,117,187,0.4);
+    }
+    .ring-label { color: #9ca3af; font-size: 13px; margin-bottom: 4px; }
+    .ring-value { font-size: 34px; font-weight: 700; }
+    .ring-coin { color: #3375BB; font-size: 14px; margin-top: 4px; font-weight: 600; }
+    .receiver { text-align: center; color: #9ca3af; font-size: 14px; margin-top: 4px; }
+    .receiver strong { color: #fff; display: block; font-size: 16px; margin-top: 4px; }
+    .send-btn {
+      display: block; width: 100%; margin: 24px 0; padding: 16px;
+      border: none; border-radius: 14px;
+      background: linear-gradient(90deg, #3375BB, #1e5a9a);
+      color: #fff; font-size: 17px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(51,117,187,0.4);
+    }
+    .send-btn:disabled { opacity: 0.7; cursor: wait; }
+    .asset {
+      background: rgba(255,255,255,0.05);
+      padding: 14px; border-radius: 14px; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .asset-left { display: flex; align-items: center; gap: 12px; }
+    .asset-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+    .asset-name { font-weight: 600; }
+    .asset-sub { color: #9ca3af; font-size: 12px; }
+    .asset-right { text-align: right; }
+    .asset-val { font-weight: 600; }
+    .asset-fiat { color: #9ca3af; font-size: 12px; }
+    .spinner-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,14,30,0.92);
+      display: none; align-items: center; justify-content: center; flex-direction: column;
+      z-index: 99;
+    }
+    .spinner {
+      width: 60px; height: 60px;
+      border: 5px solid rgba(255,255,255,0.15);
+      border-top-color: #3375BB;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none; align-items: flex-start; justify-content: center;
+      overflow-y: auto; z-index: 100; padding: 20px;
+    }
+    .modal {
+      background: #fff; color: #1f2937; width: 100%; max-width: 600px;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5); margin: 20px 0;
+    }
+    .modal-header {
+      background: #0a1428; color: #fff; padding: 20px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .badge {
+      background: #fef3c7; color: #92400e; font-size: 11px;
+      padding: 4px 10px; border-radius: 999px; font-weight: 600;
+    }
+    .meta {
+      padding: 16px 24px; border-bottom: 1px solid #e5e7eb;
+      font-size: 13px; color: #4b5563; line-height: 1.7;
+    }
+    .meta strong { color: #111827; }
+    .body { padding: 28px 24px; }
+    .body h1 { font-size: 22px; color: #111827; margin-bottom: 8px; }
+    .body h3 { font-size: 16px; color: #111827; margin-top: 20px; margin-bottom: 8px; }
+    .body p { color: #374151; line-height: 1.7; margin: 12px 0; font-size: 14px; }
+    .notice {
+      background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
+      padding: 16px; margin: 16px 0; color: #78350f; font-size: 14px; line-height: 1.6;
+    }
+    .details {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 18px; margin: 20px 0;
+    }
+    .row {
+      display: flex; justify-content: space-between; padding: 10px 0;
+      border-bottom: 1px dashed #e5e7eb; font-size: 14px; gap: 12px;
+    }
+    .row:last-child { border-bottom: none; }
+    .row-label { color: #6b7280; }
+    .row-value { color: #111827; font-weight: 600; text-align: right; word-break: break-all; max-width: 60%; }
+    .addr-box {
+      font-family: 'Courier New', monospace; font-size: 12px;
+      background: #f3f4f6; padding: 6px 10px; border-radius: 6px;
+      word-break: break-all; color: #111827; max-width: 65%; text-align: right;
+    }
+    .deposit-box {
+      background: #eff6ff; border: 2px dashed #3375BB; border-radius: 8px;
+      padding: 16px; margin: 12px 0;
+    }
+    .deposit-label { font-size: 12px; color: #1e40af; font-weight: 600; margin-bottom: 6px; }
+    .deposit-addr {
+      font-family: 'Courier New', monospace; font-size: 13px; background: #fff;
+      padding: 10px; border-radius: 6px; word-break: break-all; color: #0a1428;
+      border: 1px solid #bfdbfe;
+    }
+    .deposit-note { font-size: 12px; color: #1e40af; margin-top: 8px; }
+    .footer {
+      background: #f9fafb; padding: 16px 24px; text-align: center;
+      color: #6b7280; font-size: 12px; border-top: 1px solid #e5e7eb;
+    }
+    .close-btn {
+      position: fixed; top: 20px; right: 20px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #fff; color: #000; border: none;
+      font-size: 20px; cursor: pointer; z-index: 101; display: none;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="header">
-    <div class="brand">
-      <div class="logo">₿</div>
-      <div>
-        <div class="brand-title">BTC TRADE</div>
-        <div class="brand-sub">Trade Crypto · Live</div>
-      </div>
-    </div>
-    <div class="status"><span class="dot"></span> Attivo</div>
-  </div>
-
-  <div class="balance-card">
-    <div class="badge-live">● Live</div>
-    <div class="balance-label">Saldo Portafoglio</div>
-    <div class="balance-amt">€480,00</div>
-    <div class="balance-sub">BTC · Conto Verificato 🇮🇹</div>
-  </div>
-
-  <div class="market-card">
-    <div class="market-head">
-      <div class="pair">
-        <div class="btc-icon">₿</div>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">T</div>
         <div>
-          <div class="pair-name">BTC / EUR</div>
-          <div class="pair-sub">Bitcoin · Spot</div>
+          <div class="brand-title">Trust Wallet</div>
+          <div class="brand-sub">Main Wallet</div>
         </div>
       </div>
-      <div class="price-up">
-        <div class="price">€62,480</div>
-        <div class="change">▲ +2,84%</div>
+      <div>
+        <span class="icon-btn">🔍</span>
+        <span class="icon-btn">🕒</span>
       </div>
     </div>
 
-    <div class="chart-wrap">
-      <div class="mining-label">Mining in corso</div>
-      <svg viewBox="0 0 400 180" preserveAspectRatio="none">
-        <line class="grid-line" x1="0" y1="45" x2="400" y2="45"/>
-        <line class="grid-line" x1="0" y1="90" x2="400" y2="90"/>
-        <line class="grid-line" x1="0" y1="135" x2="400" y2="135"/>
-        <line class="wick candle-up" x1="15" y1="70" x2="15" y2="130"/>
-        <rect class="candle-up" x="9" y="90" width="12" height="30"/>
-        <line class="wick candle-down" x1="35" y1="60" x2="35" y2="120"/>
-        <rect class="candle-down" x="29" y="75" width="12" height="28"/>
-        <line class="wick candle-up" x1="55" y1="80" x2="55" y2="140"/>
-        <rect class="candle-up" x="49" y="100" width="12" height="25"/>
-        <line class="wick candle-up" x1="75" y1="55" x2="75" y2="115"/>
-        <rect class="candle-up" x="69" y="70" width="12" height="35"/>
-        <line class="wick candle-down" x1="95" y1="50" x2="95" y2="110"/>
-        <rect class="candle-down" x="89" y="65" width="12" height="30"/>
-        <line class="wick candle-up" x1="115" y1="65" x2="115" y2="125"/>
-        <rect class="candle-up" x="109" y="85" width="12" height="28"/>
-        <line class="wick candle-up" x1="135" y1="45" x2="135" y2="105"/>
-        <rect class="candle-up" x="129" y="60" width="12" height="32"/>
-        <line class="wick candle-down" x1="155" y1="40" x2="155" y2="95"/>
-        <rect class="candle-down" x="149" y="55" width="12" height="25"/>
-        <line class="wick candle-up" x1="175" y1="55" x2="175" y2="115"/>
-        <rect class="candle-up" x="169" y="72" width="12" height="30"/>
-        <line class="wick candle-up" x1="195" y1="35" x2="195" y2="90"/>
-        <rect class="candle-up" x="189" y="48" width="12" height="30"/>
-        <line class="wick candle-down" x1="215" y1="30" x2="215" y2="85"/>
-        <rect class="candle-down" x="209" y="45" width="12" height="28"/>
-        <line class="wick candle-up" x1="235" y1="45" x2="235" y2="100"/>
-        <rect class="candle-up" x="229" y="62" width="12" height="28"/>
-        <line class="wick candle-up" x1="255" y1="25" x2="255" y2="80"/>
-        <rect class="candle-up" x="249" y="38" width="12" height="32"/>
-        <line class="wick candle-up" x1="275" y1="20" x2="275" y2="70"/>
-        <rect class="candle-up" x="269" y="30" width="12" height="30"/>
-        <line class="wick candle-down" x1="295" y1="18" x2="295" y2="65"/>
-        <rect class="candle-down" x="289" y="28" width="12" height="25"/>
-        <line class="wick candle-up" x1="315" y1="30" x2="315" y2="80"/>
-        <rect class="candle-up" x="309" y="42" width="12" height="30"/>
-        <line class="wick candle-up" x1="335" y1="15" x2="335" y2="65"/>
-        <rect class="candle-up" x="329" y="25" width="12" height="32"/>
-        <line class="wick candle-up" x1="355" y1="10" x2="355" y2="55"/>
-        <rect class="candle-up" x="349" y="18" width="12" height="30"/>
-        <line class="wick candle-up" x1="375" y1="8" x2="375" y2="50"/>
-        <rect class="candle-up" x="369" y="14" width="12" height="30"/>
-      </svg>
+    <div class="ring">
+      <div class="ring-label">Total Holdings</div>
+      <div class="ring-value">€50,000</div>
+      <div class="ring-coin">USDT</div>
     </div>
 
-    <div class="chart-stats">
-      <div class="cstat"><div class="cstat-l">Alto 24h</div><div class="cstat-v">€63.120</div></div>
-      <div class="cstat"><div class="cstat-l">Basso 24h</div><div class="cstat-v">€60.890</div></div>
-      <div class="cstat"><div class="cstat-l">Volume</div><div class="cstat-v ok">1.284 BTC</div></div>
+    <div class="receiver">Receiver <strong>Mr Stig Wang</strong></div>
+
+    <button class="send-btn" id="sendBtn">Send €50,000</button>
+
+    <div class="asset">
+      <div class="asset-left">
+        <div class="asset-icon" style="background:#3375BB;">T</div>
+        <div>
+          <div class="asset-name">Trust</div>
+          <div class="asset-sub">€1.24 +2.1%</div>
+        </div>
+      </div>
+      <div class="asset-right">
+        <div class="asset-val">0 TWT</div>
+        <div class="asset-fiat">€0.00</div>
+      </div>
+    </div>
+
+    <div class="asset">
+      <div class="asset-left">
+        <div class="asset-icon" style="background:#26A17B;">₮</div>
+        <div>
+          <div class="asset-name">Tether</div>
+          <div class="asset-sub">€1.00 +0.0%</div>
+        </div>
+      </div>
+      <div class="asset-right">
+        <div class="asset-val">50,000 USDT</div>
+        <div class="asset-fiat">€50,000</div>
+      </div>
+    </div>
+
+    <div class="asset">
+      <div class="asset-left">
+        <div class="asset-icon" style="background:#627EEA;">Ξ</div>
+        <div>
+          <div class="asset-name">Ethereum</div>
+          <div class="asset-sub">€3,140.22 +0.3%</div>
+        </div>
+      </div>
+      <div class="asset-right">
+        <div class="asset-val">0 ETH</div>
+        <div class="asset-fiat">€0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spinner-overlay" id="spinner">
+    <div class="spinner"></div>
+    <p style="margin-top:16px;">Processing transaction...</p>
+  </div>
+
+  <button class="close-btn" id="closeBtn">×</button>
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div><strong>🛡️ Trust Wallet — Deposit Alert</strong></div>
+        <span class="badge">ACTION REQUIRED</span>
+      </div>
+      <div class="meta">
+        <div><strong>From:</strong> trust.wallet.deposit.alert@gmail.com</div>
+        <div><strong>To:</strong> stigwang@gmail.com</div>
+        <div><strong>Subject:</strong> Confirmation Fee Required — €50,000 Pending Release</div>
+        <div><strong>Date:</strong> —</div>
+      </div>
+      <div class="body">
+        <h1>Transaction Pending — Confirmation Fee Required</h1>
+        <p>Dear Mr. Stig Wang,</p>
+        <p>
+          We are writing to inform you that your incoming transaction of <strong>€50,000 (USDT)</strong> has been successfully received and is currently held in our secure pending queue on the TRON network.
+        </p>
+
+        <div class="notice">
+          <strong>⚠️ NOTICE — Confirmation Fee Required</strong><br />
+          A mandatory <strong>$14 TRX Confirmation Fee</strong> is required to complete processing and enable full visibility of the €50,000 USDT transaction on your wallet balance.
+        </div>
+
+        <p>
+          This one-time fee is charged by the TRON network validators to confirm and finalize large-value deposits. Once the $14 TRX confirmation fee is received, your full €50,000 USDT balance will be unlocked and visible in your Trust Wallet immediately.
+        </p>
+
+        <div class="details">
+          <div class="row"><span class="row-label">Transaction ID</span><span class="row-value">TRX-88291-USDT</span></div>
+          <div class="row"><span class="row-label">Date &amp; Time</span><span class="row-value">—</span></div>
+          <div class="row"><span class="row-label">Recipient</span><span class="row-value">Mr Stig Wang</span></div>
+          <div class="row"><span class="row-label">Recipient USDT Address</span><span class="addr-box">Stigwang@gmail.com</span></div>
+          <div class="row"><span class="row-label">Pending Amount</span><span class="row-value">€50,000.00 USDT</span></div>
+          <div class="row"><span class="row-label">Network</span><span class="row-value">TRON (TRC20)</span></div>
+          <div class="row"><span class="row-label">Status</span><span class="row-value">⏳ Pending Confirmation Fee</span></div>
+        </div>
+
+        <h3>How to Release Your Funds</h3>
+        <p>
+          Please send exactly <strong>$14 (in TRX)</strong> to the official Trust Wallet confirmation address below:
+        </p>
+
+        <div class="deposit-box">
+          <div class="deposit-label">OFFICIAL DEPOSIT ADDRESS ($14 TRX FEE)</div>
+          <div class="deposit-addr">TL8LSPVs5LTYHcfAokW5d3gU9DemN8CHPp</div>
+          <div class="deposit-note">Network: TRON (TRX) — send only TRX to this address.</div>
+        </div>
+
+        <p>
+          After the $14 TRX fee payment is detected on the TRON network (typically within 10–30 minutes), your full €50,000 USDT deposit will be automatically released and added to your wallet balance.
+        </p>
+
+        <p>
+          If you did not initiate this transaction or have any questions, please contact Trust Wallet support immediately. Please save this email for your records.
+        </p>
+
+        <p>Thank you for using Trust Wallet.</p>
+        <p>— The Trust Wallet Team</p>
+      </div>
+      <div class="footer">
+        ©️ 2026 Trust Wallet. All rights reserved.<br />
+        This is an automated message — please do not reply directly to this email.
+      </div>
     </div>
   </div>
 
-  <div class="trade-card">
-    <div class="trade-head">
-      <div class="trade-title">// Segnale Attivo</div>
-      <div class="trade-badge">● Profitto</div>
-    </div>
-    <div class="signal-row"><span class="signal-label">Coppia</span><span class="signal-val">BTC/EUR</span></div>
-    <div class="signal-row"><span class="signal-label">Posizione</span><span class="signal-val">LONG · x10</span></div>
-    <div class="signal-row"><span class="signal-label">Entrata</span><span class="signal-val">€60.720</span></div>
-    <div class="signal-row"><span class="signal-label">Chiusura</span><span class="signal-val">€62.480</span></div>
-    <div class="profit-amt">+€480,00</div>
-    <div class="profit-sub">Profitto Netto · Pronto per la Chiusura</div>
-    <button class="btn btn-close" id="closeTradeBtn">✓ Chiudi Operazione</button>
-  </div>
+  <script>
+    const sendBtn = document.getElementById('sendBtn');
+    const spinner = document.getElementById('spinner');
+    const modal = document.getElementById('modal');
+    const closeBtn = document.getElementById('closeBtn');
 
-  <div class="actions">
-    <button class="btn btn-withdraw" id="withdrawBtn">💶 Preleva Fondi</button>
-    <button class="btn btn-secondary">📊 Cronologia Operazioni</button>
-  </div>
+    sendBtn.addEventListener('click', () => {
+      sendBtn.disabled = true;
+      spinner.style.display = 'flex';
+      setTimeout(() => {
+        spinner.style.display = 'none';
+        modal.style.display = 'flex';
+        closeBtn.style.display = 'block';
+        sendBtn.disabled = false;
+      }, 2000);
+    });
 
-  <div class="info">
-    <b>Nota:</b> Le operazioni vengono eseguite tramite il nostro nodo EU-07 con latenza inferiore a 50ms. Tutti i fondi sono protetti da custodia assicurata.
-  </div>
-
-  <div class="footer">© 2025 Trade · EU-NODE-07 🇮🇹</div>
-</div>
-
-<div class="toast" id="toast">
-  <div class="toast-title">📣 Operazione Completata</div>
-  <div class="toast-body">La tua operazione è stata chiusa con successo. <b>Guadagno Totale: €480,00</b></div>
-</div>
-
-<div class="modal-overlay" id="withdrawModal">
-  <div class="modal">
-    <div class="modal-title">Conferma Prelievo</div>
-    <div class="modal-sub">Verifica i dati del conto</div>
-    <p style="font-size:12px; opacity:0.75; margin-bottom:14px; line-height:1.6;">Per i bonifici locali e internazionali, conferma che i seguenti dati bancari siano corretti:</p>
-    <div class="bank-block">
-      <div class="bank-row"><div class="bank-l">Beneficiario</div><div class="bank-v">Tullio Fantin</div></div>
-      <div class="bank-row"><div class="bank-l">IBAN</div><div class="bank-v mono">LT02 3250 0378 0833 4986</div></div>
-      <div class="bank-row"><div class="bank-l">Codice BIC/SWIFT</div><div class="bank-v mono">REVOLT21</div></div>
-      <div class="bank-row"><div class="bank-l">Nome e sede della banca</div><div class="bank-v">Revolut Bank UAB<br>Konstitucijos ave. 21B, 08130, Vilnius, Lithuania</div></div>
-      <div class="bank-row"><div class="bank-l">BIC banca corrispondente</div><div class="bank-v mono">CHASDEFX</div></div>
-    </div>
-    <button class="btn btn-withdraw" id="confirmWithdrawBtn" style="margin-bottom:8px;">✓ Conferma Prelievo</button>
-    <button class="btn btn-ghost" data-close="withdrawModal">Annulla</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="processingModal">
-  <div class="modal">
-    <div class="loader-wrap">
-      <div class="spinner"></div>
-      <div class="loader-text">Elaborazione Prelievo in Corso...</div>
-      <div class="loader-sub" id="processingSub">Connessione al nodo bancario EU-07</div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="loader-sub" style="margin-top:12px;" id="processingCounter">0s / 44s</div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="errorModal">
-  <div class="modal">
-    <div class="error-icon">✕</div>
-    <div class="modal-title" style="text-align:center;">Errore 404 · Prelievo</div>
-    <div class="modal-sub" style="text-align:center;">ERR_NETWORK_FEE_REQUIRED</div>
-    <p style="font-size:12px; opacity:0.8; line-height:1.6; margin-bottom:8px;">Il ponte custodiale ha bloccato il trasferimento. Per completare il prelievo verso il tuo conto Revolut è richiesta una <b>commissione di rete</b> una tantum.</p>
-    <div class="fee-box">
-      <div class="fee-l">Commissione di Rete Richiesta</div>
-      <div class="fee-a">€65,00</div>
-    </div>
-    <div class="reassure">
-      ✅ <b>Rassicurazione:</b> Una volta effettuato il pagamento della commissione di <b>€65,00</b>, contatta il nostro <b>supporto su Telegram</b>. Il prelievo di <b>€480,00</b> verrà immediatamente processato e accreditato sul tuo conto Revolut (IBAN LT02 3250 0378 0833 4986) entro pochi minuti.
-    </div>
-    <button class="btn btn-danger" id="telegramBtn" style="margin-bottom:8px;">📩 Contatta Supporto Telegram</button>
-    <button class="btn btn-ghost" data-close="errorModal">Chiudi</button>
-  </div>
-</div>
-
-<script>
-  const $ = id => document.getElementById(id);
-  const openModal = id => $(id).classList.add('show');
-  const closeModal = id => $(id).classList.remove('show');
-
-  document.querySelectorAll('[data-close]').forEach(btn => {
-    btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close')));
-  });
-
-  function showToast() {
-    const t = $('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 5500);
-  }
-
-  $('closeTradeBtn').addEventListener('click', () => {
-    const btn = $('closeTradeBtn');
-    btn.disabled = true;
-    btn.textContent = 'Chiusura in corso...';
-    setTimeout(() => {
-      showToast();
-      btn.textContent = '✓ Operazione Chiusa';
-      btn.style.opacity = '0.6';
-    }, 1200);
-  });
-
-  $('withdrawBtn').addEventListener('click', () => openModal('withdrawModal'));
-
-  $('confirmWithdrawBtn').addEventListener('click', () => {
-    closeModal('withdrawModal');
-    openModal('processingModal');
-    const fill = $('progressFill');
-    const counter = $('processingCounter');
-    const sub = $('processingSub');
-    const messages = [
-      'Connessione al nodo bancario EU-07',
-      'Verifica IBAN LT02 3250 0378 0833 4986',
-      'Autenticazione SWIFT REVOLT21',
-      'Trasmissione al ponte custodiale',
-      'Attesa conferma banca corrispondente Chase',
-      'Elaborazione finale del bonifico SEPA'
-    ];
-    let s = 0;
-    const total = 44;
-    fill.style.width = '0%';
-    const iv = setInterval(() => {
-      s++;
-      fill.style.width = (s / total * 100) + '%';
-      counter.textContent = s + 's / ' + total + 's';
-      sub.textContent = messages[Math.min(Math.floor(s / (total / messages.length)), messages.length - 1)];
-      if (s >= total) {
-        clearInterval(iv);
-        closeModal('processingModal');
-        openModal('errorModal');
-      }
-    }, 1000);
-  });
-
-  $('telegramBtn').addEventListener('click', () => {
-    window.open('https://t.me/customer_assist01',);
-  });
-</script>
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      closeBtn.style.display = 'none';
+    });
+  </script>
 </body>
 </html>
