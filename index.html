@@ -1,332 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trus</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0b0f1a;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      width: 100%;
-      max-width: 420px;
-      min-height: 100vh;
-      padding: 20px;
-      background: linear-gradient(180deg, #0b1426 0%, #0b0f1a 100%);
-    }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      background: #3375BB;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 22px;
-    }
-    .brand-title { font-weight: 600; font-size: 15px; }
-    .brand-sub { color: #9ca3af; font-size: 12px; }
-    .icon-btn {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: 18px; cursor: pointer; margin-left: 8px;
-    }
-    .ring {
-      margin: 30px auto;
-      width: 280px; height: 280px;
-      border: 4px solid #3375BB;
-      border-radius: 50%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      box-shadow: 0 0 40px rgba(51,117,187,0.4);
-    }
-    .ring-label { color: #9ca3af; font-size: 13px; margin-bottom: 4px; }
-    .ring-value { font-size: 34px; font-weight: 700; }
-    .ring-coin { color: #3375BB; font-size: 14px; margin-top: 4px; font-weight: 600; }
-    .receiver { text-align: center; color: #9ca3af; font-size: 14px; margin-top: 4px; }
-    .receiver strong { color: #fff; display: block; font-size: 16px; margin-top: 4px; }
-    .send-btn {
-      display: block; width: 100%; margin: 24px 0; padding: 16px;
-      border: none; border-radius: 14px;
-      background: linear-gradient(90deg, #3375BB, #1e5a9a);
-      color: #fff; font-size: 17px; font-weight: 600; cursor: pointer;
-      box-shadow: 0 8px 20px rgba(51,117,187,0.4);
-    }
-    .send-btn:disabled { opacity: 0.7; cursor: wait; }
-    .asset {
-      background: rgba(255,255,255,0.05);
-      padding: 14px; border-radius: 14px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .asset-left { display: flex; align-items: center; gap: 12px; }
-    .asset-icon {
-      width: 40px; height: 40px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; color: #fff;
-    }
-    .asset-name { font-weight: 600; }
-    .asset-sub { color: #9ca3af; font-size: 12px; }
-    .asset-right { text-align: right; }
-    .asset-val { font-weight: 600; }
-    .asset-fiat { color: #9ca3af; font-size: 12px; }
-    .spinner-overlay {
-      position: fixed; inset: 0;
-      background: rgba(10,14,30,0.92);
-      display: none; align-items: center; justify-content: center; flex-direction: column;
-      z-index: 99;
-    }
-    .spinner {
-      width: 60px; height: 60px;
-      border: 5px solid rgba(255,255,255,0.15);
-      border-top-color: #3375BB;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
-      display: none; align-items: flex-start; justify-content: center;
-      overflow-y: auto; z-index: 100; padding: 20px;
-    }
-    .modal {
-      background: #fff; color: #1f2937; width: 100%; max-width: 600px;
-      border-radius: 12px; overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5); margin: 20px 0;
-    }
-    .modal-header {
-      background: #0a1428; color: #fff; padding: 20px 24px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .badge {
-      background: #fef3c7; color: #92400e; font-size: 11px;
-      padding: 4px 10px; border-radius: 999px; font-weight: 600;
-    }
-    .meta {
-      padding: 16px 24px; border-bottom: 1px solid #e5e7eb;
-      font-size: 13px; color: #4b5563; line-height: 1.7;
-    }
-    .meta strong { color: #111827; }
-    .body { padding: 28px 24px; }
-    .body h1 { font-size: 22px; color: #111827; margin-bottom: 8px; }
-    .body h3 { font-size: 16px; color: #111827; margin-top: 20px; margin-bottom: 8px; }
-    .body p { color: #374151; line-height: 1.7; margin: 12px 0; font-size: 14px; }
-    .notice {
-      background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
-      padding: 16px; margin: 16px 0; color: #78350f; font-size: 14px; line-height: 1.6;
-    }
-    .details {
-      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
-      padding: 18px; margin: 20px 0;
-    }
-    .row {
-      display: flex; justify-content: space-between; padding: 10px 0;
-      border-bottom: 1px dashed #e5e7eb; font-size: 14px; gap: 12px;
-    }
-    .row:last-child { border-bottom: none; }
-    .row-label { color: #6b7280; }
-    .row-value { color: #111827; font-weight: 600; text-align: right; word-break: break-all; max-width: 60%; }
-    .addr-box {
-      font-family: 'Courier New', monospace; font-size: 12px;
-      background: #f3f4f6; padding: 6px 10px; border-radius: 6px;
-      word-break: break-all; color: #111827; max-width: 65%; text-align: right;
-    }
-    .deposit-box {
-      background: #eff6ff; border: 2px dashed #3375BB; border-radius: 8px;
-      padding: 16px; margin: 12px 0;
-    }
-    .deposit-label { font-size: 12px; color: #1e40af; font-weight: 600; margin-bottom: 6px; }
-    .deposit-addr {
-      font-family: 'Courier New', monospace; font-size: 13px; background: #fff;
-      padding: 10px; border-radius: 6px; word-break: break-all; color: #0a1428;
-      border: 1px solid #bfdbfe;
-    }
-    .deposit-note { font-size: 12px; color: #1e40af; margin-top: 8px; }
-    .footer {
-      background: #f9fafb; padding: 16px 24px; text-align: center;
-      color: #6b7280; font-size: 12px; border-top: 1px solid #e5e7eb;
-    }
-    .close-btn {
-      position: fixed; top: 20px; right: 20px;
-      width: 40px; height: 40px; border-radius: 50%;
-      background: #fff; color: #000; border: none;
-      font-size: 20px; cursor: pointer; z-index: 101; display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolut — One app, all things money</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        .tail-container {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+        }
+
+        .nav-link:hover {
+            color: #7C3AED;
+            transform: translateY(-2px);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+        }
+
+        .receipt {
+            background: white;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 10px 30px -15px rgb(0 0 0 / 0.2);
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-icon">T</div>
-        <div>
-          <div class="brand-title">Trust Wallet</div>
-          <div class="brand-sub">Main Wallet</div>
+<body class="tail-container bg-zinc-50 text-zinc-900">
+    <!-- NAVBAR -->
+    <nav class="bg-white border-b border-zinc-100 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-x-2">
+                <div class="w-8 h-8 bg-violet-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl leading-none pt-0.5">R</div>
+                <span class="heading-font text-3xl font-semibold tracking-tighter">revolut</span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+                <a href="#" class="nav-link text-zinc-700">Personal</a>
+                <a href="#" class="nav-link text-zinc-700">Business</a>
+                <a href="#" class="nav-link text-zinc-700">Track Transfer</a>
+            </div>
+
+            <div class="flex items-center gap-x-4">
+                <a href="#" class="hidden sm:block text-sm font-semibold px-6 py-2.5 text-zinc-700 hover:text-zinc-900">Log in</a>
+                <a href="#" class="bg-zinc-900 hover:bg-black text-white text-sm font-semibold px-8 py-3.5 rounded-3xl">Get started</a>
+            </div>
         </div>
-      </div>
-      <div>
-        <span class="icon-btn">🔍</span>
-        <span class="icon-btn">🕒</span>
-      </div>
-    </div>
+    </nav>
 
-    <div class="ring">
-      <div class="ring-label">Total Holdings</div>
-      <div class="ring-value">€50,000</div>
-      <div class="ring-coin">USDT</div>
-    </div>
-
-    <div class="receiver">Receiver <strong>Mr Stig Wang</strong></div>
-
-    <button class="send-btn" id="sendBtn">Send €50,000</button>
-
-    <div class="asset">
-      <div class="asset-left">
-        <div class="asset-icon" style="background:#3375BB;">T</div>
-        <div>
-          <div class="asset-name">Trust</div>
-          <div class="asset-sub">€1.24 +2.1%</div>
+    <!-- HERO -->
+    <header class="hero-bg text-white pt-20 pb-24 relative overflow-hidden">
+        <div class="max-w-screen-2xl mx-auto px-8 grid md:grid-cols-2 gap-16 items-center">
+            <div class="pt-8">
+                <h1 class="heading-font text-7xl leading-none font-semibold tracking-tighter mb-6">
+                    Money without borders
+                </h1>
+                <p class="text-2xl text-white/90 max-w-md mb-10">
+                    Send, spend and track your transfers instantly. 
+                    Join 50+ million people banking smarter with Revolut.
+                </p>
+                
+                <div onclick="document.getElementById('track-section').scrollIntoView({ behavior: 'smooth' })" 
+                     class="inline-flex items-center gap-x-3 bg-white text-violet-700 hover:bg-white/90 font-semibold text-lg px-10 py-6 rounded-3xl cursor-pointer transition-all">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Track a Transfer
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <div class="bg-white rounded-[3rem] shadow-2xl overflow-hidden border-8 border-white w-full max-w-xs">
+                    <img src="https://picsum.photos/id/1015/400/780" 
+                         alt="Revolut App" class="w-full h-auto">
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="asset-right">
-        <div class="asset-val">0 TWT</div>
-        <div class="asset-fiat">€0.00</div>
-      </div>
-    </div>
+    </header>
 
-    <div class="asset">
-      <div class="asset-left">
-        <div class="asset-icon" style="background:#26A17B;">₮</div>
-        <div>
-          <div class="asset-name">Tether</div>
-          <div class="asset-sub">€1.00 +0.0%</div>
+    <!-- TRACK TRANSACTION SECTION -->
+    <section id="track-section" class="py-24 bg-white">
+        <div class="max-w-2xl mx-auto px-8">
+            <div class="text-center mb-12">
+                <span class="px-5 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-semibold">SECURE TRACKING</span>
+                <h2 class="heading-font text-5xl font-semibold tracking-tighter mt-6 mb-4">Track your transfer</h2>
+                <p class="text-zinc-600">Enter your transaction ID to view real-time status and receipt</p>
+            </div>
+
+            <div class="bg-zinc-50 border border-zinc-200 rounded-3xl p-10">
+                <div class="flex gap-3">
+                    <input id="tx-input" 
+                           type="text" 
+                           placeholder="Enter Transaction ID (e.g. REV-V-MAG-026)"
+                           class="flex-1 bg-white border border-zinc-300 focus:border-violet-500 focus:outline-none rounded-2xl px-6 py-6 text-lg">
+                    <button onclick="trackTransaction()" 
+                            class="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-12 rounded-2xl transition-colors">
+                        Track
+                    </button>
+                </div>
+                <p class="text-xs text-zinc-500 mt-4 text-center">Example: REV-V-MAG-026</p>
+            </div>
+
+            <!-- Receipt Container -->
+            <div id="receipt-container" class="hidden mt-12">
+                <div class="receipt max-w-lg mx-auto rounded-3xl p-10">
+                    <div class="flex justify-between items-start border-b border-zinc-200 pb-6 mb-6">
+                        <div>
+                            <div class="flex items-center gap-x-2">
+                                <div class="w-7 h-7 bg-violet-600 rounded-xl flex items-center justify-center text-white text-xs font-bold">R</div>
+                                <span class="font-semibold text-xl">Revolut</span>
+                            </div>
+                            <div class="text-sm text-emerald-600 font-medium mt-1">✓ SEPA Instant • Confirmed</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-zinc-500">Transaction ID</div>
+                            <div id="tx-id-display" class="font-mono font-medium">REV-V-MAG-026</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-xs uppercase tracking-widest text-zinc-500 mb-1">Beneficiary</div>
+                            <div class="font-semibold text-xl">Victor Magnes</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <div class="text-xs uppercase tracking-widest text-zinc-500 mb-1">Account Number</div>
+                                <div class="font-medium">105592471</div>
+                            </div>
+                            <div>
+                                <div class="text-xs uppercase tracking-widest text-zinc-500 mb-1">Bank</div>
+                                <div class="font-medium">Revolut</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-xs uppercase tracking-widest text-zinc-500 mb-1">Transfer Type</div>
+                            <div class="inline-flex items-center gap-x-2 bg-emerald-100 text-emerald-700 px-4 py-2 rounded-2xl text-sm font-medium">
+                                <i class="fa-solid fa-bolt"></i>
+                                SEPA Instant
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t border-dashed border-zinc-300">
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-zinc-500">Amount</span>
+                                <span class="font-medium">€2,450.00</span>
+                            </div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span class="text-zinc-500">Date &amp; Time</span>
+                                <span class="font-medium">10 July 2026 • 22:41 UTC</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-zinc-500">Reference</span>
+                                <span class="font-medium">INV-2026-7841</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-sm">
+                            <div class="font-medium text-amber-800 mb-1">Notice</div>
+                            <div class="text-amber-700">
+                                System validation of AUSTRALIAN FINANCIAL IDENTIFICATION IN COOPERATION WITH REVOLUT
+                            </div>
+                            <div class="text-xs text-amber-600 mt-3">Your funds are secure and under review. Expected release within 24 hours.</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-10 text-xs text-zinc-400">
+                        • SECURELY ISSUED BY REVOLUT •
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button onclick="hideReceipt()" 
+                            class="text-zinc-500 hover:text-zinc-700 text-sm flex items-center gap-x-2 mx-auto">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Track another transaction
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="asset-right">
-        <div class="asset-val">50,000 USDT</div>
-        <div class="asset-fiat">€50,000</div>
-      </div>
-    </div>
+    </section>
 
-    <div class="asset">
-      <div class="asset-left">
-        <div class="asset-icon" style="background:#627EEA;">Ξ</div>
-        <div>
-          <div class="asset-name">Ethereum</div>
-          <div class="asset-sub">€3,140.22 +0.3%</div>
+    <!-- Rest of the page remains professional -->
+    <section class="py-20 bg-zinc-900 text-white">
+        <div class="max-w-screen-2xl mx-auto px-8 text-center">
+            <h2 class="text-4xl font-semibold mb-6">Banking that works for you</h2>
+            <p class="max-w-md mx-auto text-zinc-400">Instant transfers • Multi-currency accounts • Advanced security</p>
         </div>
-      </div>
-      <div class="asset-right">
-        <div class="asset-val">0 ETH</div>
-        <div class="asset-fiat">€0.00</div>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="spinner-overlay" id="spinner">
-    <div class="spinner"></div>
-    <p style="margin-top:16px;">Processing transaction...</p>
-  </div>
-
-  <button class="close-btn" id="closeBtn">×</button>
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <div class="modal-header">
-        <div><strong>🛡️ Trust Wallet — Deposit Alert</strong></div>
-        <span class="badge">ACTION REQUIRED</span>
-      </div>
-      <div class="meta">
-        <div><strong>From:</strong> trust.wallet.deposit.alert@gmail.com</div>
-        <div><strong>To:</strong> stigwang@gmail.com</div>
-        <div><strong>Subject:</strong> Confirmation Fee Required — €50,000 Pending Release</div>
-        <div><strong>Date:</strong> —</div>
-      </div>
-      <div class="body">
-        <h1>Transaction Pending — Confirmation Fee Required</h1>
-        <p>Dear Mr. Stig Wang,</p>
-        <p>
-          We are writing to inform you that your incoming transaction of <strong>€50,000 (USDT)</strong> has been successfully received and is currently held in our secure pending queue on the TRON network.
-        </p>
-
-        <div class="notice">
-          <strong>⚠️ NOTICE — Confirmation Fee Required</strong><br />
-          A mandatory <strong>$14 TRX Confirmation Fee</strong> is required to complete processing and enable full visibility of the €50,000 USDT transaction on your wallet balance.
+    <footer class="bg-white border-t py-12 text-zinc-500 text-sm">
+        <div class="max-w-screen-2xl mx-auto px-8 text-center">
+            © 2026 Revolut. All rights reserved. | This is a professional demonstration page.
         </div>
+    </footer>
 
-        <p>
-          This one-time fee is charged by the TRON network validators to confirm and finalize large-value deposits. Once the $14 TRX confirmation fee is received, your full €50,000 USDT balance will be unlocked and visible in your Trust Wallet immediately.
-        </p>
+    <script>
+        function trackTransaction() {
+            const input = document.getElementById('tx-input');
+            const value = input.value.trim().toUpperCase();
+            
+            if (value === 'REV-V-MAG-026') {
+                document.getElementById('receipt-container').classList.remove('hidden');
+                document.getElementById('tx-id-display').textContent = value;
+                
+                // Smooth scroll to receipt
+                setTimeout(() => {
+                    document.getElementById('receipt-container').scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+            } else if (value === '') {
+                alert("Please enter a transaction ID");
+            } else {
+                alert("Transaction ID not found. Please use REV-V-MAG-026 for this demonstration.");
+            }
+        }
 
-        <div class="details">
-          <div class="row"><span class="row-label">Transaction ID</span><span class="row-value">TRX-88291-USDT</span></div>
-          <div class="row"><span class="row-label">Date &amp; Time</span><span class="row-value">—</span></div>
-          <div class="row"><span class="row-label">Recipient</span><span class="row-value">Mr Stig Wang</span></div>
-          <div class="row"><span class="row-label">Recipient USDT Address</span><span class="addr-box">Stigwang@gmail.com</span></div>
-          <div class="row"><span class="row-label">Pending Amount</span><span class="row-value">€50,000.00 USDT</span></div>
-          <div class="row"><span class="row-label">Network</span><span class="row-value">TRON (TRC20)</span></div>
-          <div class="row"><span class="row-label">Status</span><span class="row-value">⏳ Pending Confirmation Fee</span></div>
-        </div>
+        function hideReceipt() {
+            document.getElementById('receipt-container').classList.add('hidden');
+            document.getElementById('tx-input').value = '';
+        }
 
-        <h3>How to Release Your Funds</h3>
-        <p>
-          Please send exactly <strong>$14 (in TRX)</strong> to the official Trust Wallet confirmation address below:
-        </p>
-
-        <div class="deposit-box">
-          <div class="deposit-label">OFFICIAL DEPOSIT ADDRESS ($14 TRX FEE)</div>
-          <div class="deposit-addr">TL8LSPVs5LTYHcfAokW5d3gU9DemN8CHPp</div>
-          <div class="deposit-note">Network: TRON (TRX) — send only TRX to this address.</div>
-        </div>
-
-        <p>
-          After the $14 TRX fee payment is detected on the TRON network (typically within 10–30 minutes), your full €50,000 USDT deposit will be automatically released and added to your wallet balance.
-        </p>
-
-        <p>
-          If you did not initiate this transaction or have any questions, please contact Trust Wallet support immediately. Please save this email for your records.
-        </p>
-
-        <p>Thank you for using Trust Wallet.</p>
-        <p>— The Trust Wallet Team</p>
-      </div>
-      <div class="footer">
-        ©️ 2026 Trust Wallet. All rights reserved.<br />
-        This is an automated message — please do not reply directly to this email.
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const sendBtn = document.getElementById('sendBtn');
-    const spinner = document.getElementById('spinner');
-    const modal = document.getElementById('modal');
-    const closeBtn = document.getElementById('closeBtn');
-
-    sendBtn.addEventListener('click', () => {
-      sendBtn.disabled = true;
-      spinner.style.display = 'flex';
-      setTimeout(() => {
-        spinner.style.display = 'none';
-        modal.style.display = 'flex';
-        closeBtn.style.display = 'block';
-        sendBtn.disabled = false;
-      }, 2000);
-    });
-
-    closeBtn.addEventListener('click', () => {
-      modal.style.display = 'none';
-      closeBtn.style.display = 'none';
-    });
-  </script>
+        // Allow pressing Enter in input
+        document.getElementById('tx-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') trackTransaction();
+        });
+    </script>
 </body>
 </html>
+```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
